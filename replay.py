@@ -2,43 +2,14 @@ import sys
 import pygame
 from pygame.locals import *
 
+import board
 import entity
 
 FPS = 30
-MAP_WIDTH = 800
-MAP_HEIGHT = 600
-XBORDER = 10
-YBORDER = 20
-WIN_WIDTH = MAP_WIDTH + XBORDER + 200
-WIN_HEIGHT = MAP_HEIGHT + YBORDER + 10
+WIN_WIDTH = 1000
+WIN_HEIGHT = 700
 
 COLOR_BG = (255, 255, 255)  # white
-COLOR_COORD_LINE = (200, 200, 200)  # gray
-COLOR_RANGE = (0, 0, 0)  # black
-
-def DrawCoordLines(surface):
-	# vertical
-	vertical_count = 40
-	x = XBORDER
-	for i in xrange(vertical_count + 1):
-		pygame.draw.line(
-				surface,
-				COLOR_COORD_LINE,
-				(x, YBORDER),
-				(x, YBORDER + MAP_HEIGHT))
-		x += MAP_WIDTH / vertical_count
-
-	# horizontal
-	horizontal_count = MAP_HEIGHT * vertical_count / MAP_WIDTH
-	y = YBORDER
-	for i in xrange(horizontal_count + 1):
-		pygame.draw.line(
-				surface,
-				COLOR_COORD_LINE,
-				(XBORDER, y),
-				(XBORDER + MAP_WIDTH, y))
-		y += MAP_HEIGHT / horizontal_count
-
 
 def main():
 	pygame.init()
@@ -46,18 +17,24 @@ def main():
 
 	fpsClock = pygame.time.Clock()
 
-	display_surface = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+	main_surface = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+	main_board = board.Board(main_surface, 10, 20, 800, 600)
 
-	entity.Entity(1, entity.ROLE_ME, (200, 100), 10)
-	entity.Entity(2, entity.ROLE_TARGET, (500, 345), 20)
-	entity.Entity(3, entity.ROLE_FRIEND, (400, 245), 20)
+	# test
+	me = entity.Entity(1, entity.ROLE_ME)
+	me.pos = (100, 200)
+	me.radius = 100
+	target = entity.Entity(2, entity.ROLE_TARGET)
+	target.pos = (600, 400)
+	target.radius = 200
+	entity.Entity(3, entity.ROLE_FRIEND)
 
 	while True:
-		display_surface.fill(COLOR_BG)
+		main_surface.fill(COLOR_BG)
 
-		DrawCoordLines(display_surface)
+		main_board.DrawCoordSystem()
 
-		entity.DrawAllEntities(display_surface)
+		entity.DrawAllEntities(main_board)
 
 		for event in pygame.event.get():
 			if event.type == QUIT \
