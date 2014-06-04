@@ -4,6 +4,7 @@ from pygame.locals import *
 
 import board
 import entity
+import command
 
 FPS = 30
 WIN_WIDTH = 1000
@@ -21,13 +22,9 @@ def main():
 	main_board = board.Board(main_surface, 10, 20, 800, 600)
 
 	# test
-	me = entity.Entity(1, entity.ROLE_ME)
-	me.pos = (100, 200)
-	me.radius = 100
-	target = entity.Entity(2, entity.ROLE_TARGET)
-	target.pos = (600, 400)
-	target.radius = 200
-	entity.Entity(3, entity.ROLE_FRIEND)
+	cmd_queue = []
+	cmd_queue.append(command.CmdAddEntity(1, entity.ROLE_ME, (100, 200), 100))
+	cmd_queue.append(command.CmdAddEntity(2, entity.ROLE_TARGET, (600, 400), 200))
 
 	while True:
 		main_surface.fill(COLOR_BG)
@@ -37,10 +34,14 @@ def main():
 		entity.DrawAllEntities(main_board)
 
 		for event in pygame.event.get():
-			if event.type == QUIT \
-					or (event.type == KEYUP and event.key == K_ESCAPE):
+			if event.type == QUIT:
 				pygame.quit()
 				sys.exit()
+			elif event.type == KEYUP:
+				if event.key == K_ESCAPE:
+					for undo in reversed(cmd_queue):
+						undo()
+					cmd_queue = []
 
 		pygame.display.update()
 		fpsClock.tick(FPS)

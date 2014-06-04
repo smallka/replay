@@ -8,12 +8,14 @@ _all_entities = {}
 def GetEntity(guid):
 	return _all_entities.get(guid)
 
+def DelEntity(guid):
+	if guid in _all_entities:
+		del _all_entities[guid]
+		
 def DrawAllEntities(board):
 	top, bottom, left, right = None, None, None, None
 
 	for ent in _all_entities.values():
-		if not ent.pos or not ent.radius:
-			continue
 		if left is None or ent.pos[0] - ent.radius < left:
 			left = ent.pos[0] - ent.radius
 		if right is None or ent.pos[0] + ent.radius > right:
@@ -36,18 +38,15 @@ COLOR4ROLE = {
 }
 
 class Entity:
-	def __init__(self, guid, role):
+	def __init__(self, guid, role, pos, radius):
 		self.guid = guid
 		self.role = role
-		self.pos = None
-		self.radius = None
+		self.pos = pos
+		self.radius = radius
 
 		_all_entities[guid] = self
 
 	def Draw(self, board):
-		if not self.pos or not self.radius:
-			return
-
 		color = COLOR4ROLE[self.role]
 		board.DrawCircle(color, self.pos, self.radius)
 		
