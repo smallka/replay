@@ -11,25 +11,9 @@ def GetEntity(guid):
 def DelEntity(guid):
 	if guid in _all_entities:
 		del _all_entities[guid]
-		
-def DrawAllEntities(board):
-	top, bottom, left, right = None, None, None, None
 
-	for ent in _all_entities.values():
-		if left is None or ent.pos[0] - ent.radius < left:
-			left = ent.pos[0] - ent.radius
-		if right is None or ent.pos[0] + ent.radius > right:
-			right = ent.pos[0] + ent.radius
-		if top is None or ent.pos[1] - ent.radius < top:
-			top = ent.pos[1] - ent.radius
-		if bottom is None or ent.pos[1] + ent.radius > bottom:
-			bottom = ent.pos[1] + ent.radius
-
-	if top is not None:
-		board.AdjustScaleAndOffset(top, bottom, left, right)
-
-	for ent in _all_entities.values():
-		ent.Draw(board)
+def GetAllEntities():
+	return _all_entities.values()
 
 COLOR4ROLE = {
 	ROLE_ME : (0, 255, 255),

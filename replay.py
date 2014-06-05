@@ -7,8 +7,8 @@ import entity
 import command
 
 FPS = 30
-WIN_WIDTH = 1000
-WIN_HEIGHT = 700
+WIN_WIDTH = 900
+WIN_HEIGHT = 660
 
 COLOR_BG = (255, 255, 255)  # white
 
@@ -19,19 +19,24 @@ def main():
 	fpsClock = pygame.time.Clock()
 
 	main_surface = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-	main_board = board.Board(main_surface, 10, 20, 800, 600)
+	main_board = board.Board(main_surface, 20, 60, 800, 600)
 
 	# test
 	cmd_queue = []
-	cmd_queue.append(command.CmdAddEntity(1, entity.ROLE_ME, (100, 200), 100))
+	cmd_queue.append(command.CmdAddEntity(1, entity.ROLE_ME, (100, 200), 120))
 	cmd_queue.append(command.CmdAddEntity(2, entity.ROLE_TARGET, (600, 400), 200))
 
 	while True:
 		main_surface.fill(COLOR_BG)
 
+		entities = entity.GetAllEntities()
+
+		main_board.AdjustScaleAndOffset(entities)
+
 		main_board.DrawCoordSystem()
 
-		entity.DrawAllEntities(main_board)
+		for ent in entities:
+			ent.Draw(main_board)
 
 		for event in pygame.event.get():
 			if event.type == QUIT:
