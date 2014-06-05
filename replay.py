@@ -14,17 +14,19 @@ COLOR_BG = (255, 255, 255)  # white
 
 def main():
 	pygame.init()
-	pygame.display.set_caption('AI Play')
+	pygame.display.set_caption('Replay')
 
 	fpsClock = pygame.time.Clock()
 
 	main_surface = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-	main_board = board.Board(main_surface, 20, 60, 800, 600)
+	main_board = board.Board(main_surface, 60, 20, 800, 600)
 
 	# test
 	cmd_queue = []
 	cmd_queue.append(command.CmdAddEntity(1, entity.ROLE_ME, (100, 200), 120))
 	cmd_queue.append(command.CmdAddEntity(2, entity.ROLE_TARGET, (600, 400), 200))
+	cmd_queue.append(command.CmdAddForce(1, (1, 1.732), 200, "test", None))
+	cmd_queue.append(command.CmdSetPath(1, ((100, 200), (200, 250), (600, 400))))
 
 	while True:
 		main_surface.fill(COLOR_BG)
@@ -43,10 +45,10 @@ def main():
 				pygame.quit()
 				sys.exit()
 			elif event.type == KEYUP:
-				if event.key == K_ESCAPE:
-					for undo in reversed(cmd_queue):
-						undo()
-					cmd_queue = []
+				if event.key == K_p:
+					if len(cmd_queue) > 0:
+						cmd_queue[-1]()
+						cmd_queue = cmd_queue[0:-1]
 
 		pygame.display.update()
 		fpsClock.tick(FPS)

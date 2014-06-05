@@ -5,12 +5,12 @@ COLOR_COORD_LINE = (200, 200, 200)  # gray
 COLOR_COORD_LINE_DARK = (150, 150, 150)  # dark gray
 
 class Board:
-	def __init__(self, surface, top, left, width, height):
+	def __init__(self, surface, left, top, width, height):
 		self.surface = surface
 
 		# board on windows
-		self.top = top
 		self.left = left
+		self.top = top
 		self.width = width
 		self.height = height
 
@@ -21,23 +21,21 @@ class Board:
 		self.font = pygame.font.Font('freesansbold.ttf', 10)
 
 	def AdjustScaleAndOffset(self, entities):
-		if len(entities) > 0:
-			top, bottom, left, right = None, None, None, None
-			for ent in entities:
-				if left is None or ent.pos[0] - ent.radius < left:
-					left = ent.pos[0] - ent.radius
-				if right is None or ent.pos[0] + ent.radius > right:
-					right = ent.pos[0] + ent.radius
-				if top is None or ent.pos[1] - ent.radius < top:
-					top = ent.pos[1] - ent.radius
-				if bottom is None or ent.pos[1] + ent.radius > bottom:
-					bottom = ent.pos[1] + ent.radius
+		rect = None
+		for ent in entities:
+			if rect is None:
+				rect = ent.GetRect()
+			else:
+				rect.union_ip(ent.GetRect())
 
-			vertical_scale =  self.width * 0.8 / (right - left)
-			horizontal_scale = self.height * 0.8 / (bottom - top)
-			self.scale = min(vertical_scale, horizontal_scale)
-			self.offsetx = int((left + right - self.width / self.scale) / 2.0)
-			self.offsetz = int((top + bottom - self.height / self.scale) / 2.0)
+		if rect is None:
+			return
+
+		vertical_scale =  self.width * 0.8 / rect.width
+		horizontal_scale = self.height * 0.8 / rect.height
+		self.scale = min(vertical_scale, horizontal_scale)
+		self.offsetx = int(rect.centerx - self.width / self.scale / 2.0)
+		self.offsetz = int(rect.centery - self.height / self.scale / 2.0)
 
 	def DrawCoordSystem(self):
 		# vertical lines
@@ -93,14 +91,32 @@ class Board:
 					(self.left + self.width, y))
 			y += horizontal_step
 
-	def DrawCircle(self, color, pos, radius):
-		display_pos = [
+	def _Transform(self, pos):
+		return (
 				self.left + int((pos[0] - self.offsetx) * self.scale),
 				self.top + int(self.height - (pos[1] - self.offsetz) * self.scale),
-		]
+		)
+
+	def DrawCircle(self, color, pos, radius):
 		pygame.draw.circle(
 				self.surface,
 				color,
-				display_pos,
+				self._Transform(pos),
 				int(radius * self.scale),
 				0)
+
+	def DrawLine(self, color, start_pos, end_pos):	
+		pygame.draw.aaline(
+				self.surface,
+				color,
+				self._Transform(start_pos),
+				self._Transform(end_pos),
+				2)
+
+	def DrawLines(self, color, pointlist):	
+		pygame.draw.aalines(
+				self.surface,
+				color,
+				False,
+				[ self._Transform(pos) for pos in pointlist ])
+
