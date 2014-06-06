@@ -97,6 +97,12 @@ class Board:
 				self.top + int(self.height - (pos[1] - self.offsetz) * self.scale),
 		)
 
+	def TransformReverse(self, pos):
+		return (
+				(pos[0] - self.left) / self.scale + self.offsetx,
+				(self.height - (pos[1] - self.top)) / self.scale + self.offsetz,
+		)
+
 	def DrawCircle(self, color, pos, radius):
 		pygame.draw.circle(
 				self.surface,

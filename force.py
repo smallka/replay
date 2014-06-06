@@ -2,15 +2,14 @@ import math
 import pygame
 
 class Force:
-	def __init__(self, owner, direction, magnitude, desc, relate_id):
+	def __init__(self, owner, direction, magnitude, desc, target_id):
 		self.direction = direction
 		self.magnitude = magnitude
 		self.desc = desc
-		self.relate_id = relate_id
+		self.target_id = target_id
 
 		self.start_pos = owner.GetPos()
-		rate = magnitude / math.sqrt(
-				direction[0] * direction[0] + direction[1] * direction[1])
+		rate = magnitude / math.hypot(direction[0], direction[1])
 		self.end_pos = (
 				self.start_pos[0] + direction[0] * rate,
 				self.start_pos[1] + direction[1] * rate,

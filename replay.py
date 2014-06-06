@@ -23,10 +23,15 @@ def main():
 
 	# test
 	cmd_queue = []
-	cmd_queue.append(command.CmdAddEntity(1, entity.ROLE_ME, (100, 200), 120))
-	cmd_queue.append(command.CmdAddEntity(2, entity.ROLE_TARGET, (600, 400), 200))
+	cmd_queue.append(command.CmdAddEntity(1, (100, 200), 120))
+	cmd_queue.append(command.CmdAddEntity(2, (100, 400), 150))
+	cmd_queue.append(command.CmdAddEntity(3, (500, 400), 200))
 	cmd_queue.append(command.CmdAddForce(1, (1, 1.732), 200, "test", None))
 	cmd_queue.append(command.CmdSetPath(1, ((100, 200), (200, 250), (600, 400))))
+	cmd_queue.append(command.CmdSetTargetId(1, 3))
+	cmd_queue.append(command.CmdAddForce(2, (1, -1.732), 200, "test", None))
+	cmd_queue.append(command.CmdSetTargetId(2, 3))
+	entity.SetMe(entity.GetEntity(1))
 
 	while True:
 		main_surface.fill(COLOR_BG)
@@ -37,18 +42,24 @@ def main():
 
 		main_board.DrawCoordSystem()
 
-		for ent in entities:
+		for ent in reversed(entities):
 			ent.Draw(main_board)
 
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				pygame.quit()
 				sys.exit()
+			elif event.type == MOUSEBUTTONDOWN:
+				pos = pygame.mouse.get_pos()
+				pos = main_board.TransformReverse(pos)
+				ent = entity.GetEntityAtPos(pos)
+				if ent is not None:
+					entity.SetMe(ent)
+
 			elif event.type == KEYUP:
 				if event.key == K_p:
 					if len(cmd_queue) > 0:
-						cmd_queue[-1]()
-						cmd_queue = cmd_queue[0:-1]
+						cmd_queue.pop()()
 
 		pygame.display.update()
 		fpsClock.tick(FPS)

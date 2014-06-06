@@ -1,44 +1,96 @@
+import math
 import pygame
 
 import force
 
-ROLE_ME = "me"
-ROLE_TARGET = "target"
-ROLE_FRIEND = "friend"
+COLOR_ENTITY_ME = (0, 255, 255)
+COLOR_ENTITY_TARGET = (255, 0, 0)
+COLOR_ENTITY_OTHER = (0, 0, 128)
 
-_all_entities = {}
+# in order: me, target, others
+_entities = []
+_me_id = None
+_target_id = None
 
-def GetEntity(guid):
-	return _all_entities.get(guid)
+def _AddEntity(ent):
+	if ent.id == _me_id:
+		_entities.insert(0, ent)
 
-def DelEntity(guid):
-	if guid in _all_entities:
-		del _all_entities[guid]
+	elif ent.id == _target_id:
+		if len(_entities) > 0 and _entities[0].id == _me_id:
+			_entities.insert(1, ent)
+		else:
+			_entities.insert(0, ent)
+	else:
+		_entities.append(ent)
+
+def GetEntity(ent_id):
+	for ent in _entities:
+		if ent.id == ent_id:
+			return ent
+	return None
+
+def DelEntity(ent_id):
+	ent = GetEntity(ent_id)
+	if ent is not None:
+		_entities.remove(ent)
 
 def GetAllEntities():
-	return _all_entities.values()
+	return _entities
 
-COLOR4ROLE = {
-	ROLE_ME : (0, 255, 255),
-	ROLE_TARGET : (0, 0, 128),
-	ROLE_FRIEND : (255, 0, 255),
-}
+def GetEntityAtPos(pos):
+	cands = []
+	for ent in _entities:
+		dist = math.hypot(ent.pos[0] - pos[0], ent.pos[1] - pos[1])
+		if dist <= ent.radius:
+			cands.append((ent, dist))
+
+	ret = None
+	min_dist = None
+	for cand in cands:
+		if min_dist is None or cand[1] < min_dist:
+			ret = cand[0]
+			min_dist = cand[1]
+
+	return ret
+
+def SetMe(ent):
+	global _me_id, _target_id
+
+	_me_id = ent.id
+	_target_id = ent.target_id
+
+	olds = _entities[:]
+	del _entities[:]
+	for ent in olds:
+		_AddEntity(ent)
 
 class Entity:
-	def __init__(self, guid, role, pos, radius):
-		self.guid = guid
-		self.role = role
+	def __init__(self, id, pos, radius):
+		self.id = id
 		self.pos = pos
 		self.radius = radius
+
+		self.target_id = None
 
 		self.force_next_id = 0
 		self.forces = {}
 		self.path = None
 
-		_all_entities[guid] = self
+		_AddEntity(self)
 
 	def GetPos(self):
 		return self.pos
+
+	def SetTargetId(self, target_id):
+		old_target_id = self.target_id
+		self.target_id = target_id
+
+		if self.id == _me_id:
+			global _target_id
+			_target_id = target_id
+
+		return old_target_id
 
 	def AddForce(self, direction, magnitude, desc, relate_id):
 		new_force = force.Force(self, direction, magnitude, desc, relate_id)
@@ -52,7 +104,6 @@ class Entity:
 
 	def SetPath(self, path):
 		old_path = self.path
-
 		self.path = path
 		return old_path
 
@@ -79,11 +130,17 @@ class Entity:
 		return rect
 	
 	def Draw(self, board):
-		color = COLOR4ROLE[self.role]
-		board.DrawCircle(color, self.pos, self.radius)
+		if self.id == _me_id:
+			board.DrawCircle(COLOR_ENTITY_ME, self.pos, self.radius)
 
-		for f in self.forces.values():
-			f.Draw(board)
-					
-		if self.path is not None:
-			board.DrawLines((0, 0, 0), self.path)
+			for f in self.forces.values():
+				f.Draw(board)
+						
+			if self.path is not None:
+				board.DrawLines((0, 0, 0), self.path)
+
+		elif self.id == _target_id:
+			board.DrawCircle(COLOR_ENTITY_TARGET, self.pos, self.radius)
+
+		else:
+			board.DrawCircle(COLOR_ENTITY_OTHER, self.pos, self.radius)
