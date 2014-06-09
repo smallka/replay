@@ -14,7 +14,7 @@ BOARD_TOP = 200
 BOARD_WIDTH = 800
 BOARD_HEIGHT = 400
 WIN_WIDTH = BOARD_LEFT + BOARD_WIDTH + 20
-WIN_HEIGHT = BOARD_TOP + BOARD_HEIGHT + 20
+WIN_HEIGHT = BOARD_TOP + BOARD_HEIGHT + 40
 
 COLOR_BG = (255, 255, 255)  # white
 
@@ -30,7 +30,7 @@ def main():
 	app = gui.App()
 	container = gui.Container(align=-1,valign=-1)
 	table = gui.Table()
-	box = gui.ScrollArea(table, BOARD_WIDTH, BOARD_TOP - 20)
+	box = gui.ScrollArea(table, BOARD_WIDTH, BOARD_TOP)
 	container.add(box, BOARD_LEFT, 0)
 	app.init(container)
 

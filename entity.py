@@ -139,6 +139,9 @@ class Entity:
 			if self.path is not None:
 				board.DrawLines((0, 0, 0), self.path)
 
+			board.DrawInfoText("guid = %d, pos = (%.2f, %.2f)"
+					% (self.id, self.pos[0], self.pos[1]))
+
 		elif self.id == _target_id:
 			board.DrawCircle(COLOR_ENTITY_TARGET, self.pos, self.radius)
 

@@ -1,6 +1,9 @@
 
 import pygame
 
+import pgu
+import pgu.text
+
 COLOR_COORD_LINE = (200, 200, 200)  # gray
 COLOR_COORD_LINE_DARK = (150, 150, 150)  # dark gray
 
@@ -126,3 +129,9 @@ class Board:
 				False,
 				[ self._Transform(pos) for pos in pointlist ])
 
+
+	def DrawInfoText(self, info):
+		surface = self.font.render(info, True, (0, 0, 0), (0, 255, 0))
+		rect = surface.get_rect()
+		rect.midtop = (self.left + self.width / 2, self.top + self.height + 20)
+		self.surface.blit(surface, rect)
