@@ -50,11 +50,23 @@ def set_target(ent_id, target_id):
 			same_ent.SetTargetId(old_target_id)
 	return Undo
 
+def set_pos(ent_id, pos):
+	ent = entity.GetEntity(ent_id)
+	if ent is None:
+		return lambda : None
+	old_pos = ent.SetPos(pos)
+	def Undo():
+		same_ent = entity.GetEntity(ent_id)
+		if same_ent:
+			same_ent.SetPos(old_pos)
+	return Undo
+
 keywords = {
 	"add_entity": (int, to_pos, float, ),
 	"set_force": (int, to_pos, float, ),
 	"set_path": (int, to_pos, ),
 	"set_target": (int, int, ),
+	"set_pos": (int, to_pos, ),
 }
 
 class Processor:

@@ -38,6 +38,7 @@ def main():
 
 	while True:
 		need_scroll_down = False
+		entities_count = len(entity.GetAllEntities())
 
 		for event in pygame.event.get():
 			if event.type == QUIT:
@@ -48,15 +49,39 @@ def main():
 				if event.key == K_ESCAPE:
 					pygame.quit()
 					sys.exit()
+
 				elif event.key == K_j:
+					# next cmd
 					line = proc.Next()
 					if line is not None:
 						table.tr()
 						table.td(gui.Label(line), align=-1)
 						need_scroll_down = True
+
 				elif event.key == K_k:
+					# undo prev cmd
 					if proc.Prev():
 						table.remove_row(table.getRows() - 1)
+
+				elif event.key == K_m:
+					# next cmds until me move
+					me = entity.GetMe()
+					if me is not None:
+						old_pos = me.pos
+						while True:
+							line = proc.Next()
+							if line is None:
+								break
+
+							table.tr()
+							table.td(gui.Label(line), align=-1)
+							need_scroll_down = True
+
+							if me.pos != old_pos:
+								break
+
+				elif event.key == K_a:
+					main_board.AdjustScaleAndOffset(entity.GetAllEntities())
 
 			elif event.type == MOUSEBUTTONDOWN:
 				pos = pygame.mouse.get_pos()
@@ -74,7 +99,8 @@ def main():
 
 		entities = entity.GetAllEntities()
 
-		main_board.AdjustScaleAndOffset(entities)
+		if len(entities) != entities_count:
+			main_board.AdjustScaleAndOffset(entities)
 
 		main_board.DrawCoordSystem()
 

@@ -65,6 +65,11 @@ def SetMe(ent):
 	for ent in olds:
 		_AddEntity(ent)
 
+def GetMe():
+	if _me_id is None:
+		return None
+	return GetEntity(_me_id)
+
 class Entity:
 	def __init__(self, id, pos, radius):
 		self.id = id
@@ -106,6 +111,11 @@ class Entity:
 		old_path = self.path
 		self.path = path
 		return old_path
+
+	def SetPos(self, pos):
+		old_pos = self.pos
+		self.pos = pos
+		return old_pos
 
 	def GetRect(self):
 		rect = pygame.Rect(
