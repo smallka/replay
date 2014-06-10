@@ -6,7 +6,7 @@ from pgu import gui
 
 import board
 import entity
-import command
+import processor
 
 FPS = 30
 BOARD_LEFT = 60
@@ -28,23 +28,13 @@ def main():
 	main_board = board.Board(screen, BOARD_LEFT, BOARD_TOP, BOARD_WIDTH, BOARD_HEIGHT)
 
 	app = gui.App()
-	container = gui.Container(align=-1,valign=-1)
+	container = gui.Container(align=-1, valign=-1)
 	table = gui.Table()
 	box = gui.ScrollArea(table, BOARD_WIDTH, BOARD_TOP)
 	container.add(box, BOARD_LEFT, 0)
 	app.init(container)
 
-	# test
-	cmd_queue = []
-	cmd_queue.append(command.CmdAddEntity(1, (100, 200), 120))
-	cmd_queue.append(command.CmdAddEntity(2, (100, 400), 150))
-	cmd_queue.append(command.CmdAddEntity(3, (500, 400), 200))
-	cmd_queue.append(command.CmdAddForce(1, (1, 1.732), 200, "test", None))
-	cmd_queue.append(command.CmdSetPath(1, ((100, 200), (200, 250), (500, 400))))
-	cmd_queue.append(command.CmdSetTargetId(1, 3))
-	cmd_queue.append(command.CmdAddForce(2, (1, -1.732), 200, "test", None))
-	cmd_queue.append(command.CmdSetTargetId(2, 3))
-	entity.SetMe(entity.GetEntity(1))
+	proc = processor.Processor("input.log")
 
 	while True:
 		need_scroll_down = False
@@ -58,16 +48,15 @@ def main():
 				if event.key == K_ESCAPE:
 					pygame.quit()
 					sys.exit()
-				elif event.key == K_p:
-					if len(cmd_queue) > 0:
-						cmd_queue.pop()()
 				elif event.key == K_j:
-					# test
-					import random
-					table.tr()
-					newline = gui.Label("%f" % random.random())
-					table.td(newline)
-					need_scroll_down = True
+					line = proc.Next()
+					if line is not None:
+						table.tr()
+						table.td(gui.Label(line), align=-1)
+						need_scroll_down = True
+				elif event.key == K_k:
+					if proc.Prev():
+						table.remove_row(table.getRows() - 1)
 
 			elif event.type == MOUSEBUTTONDOWN:
 				pos = pygame.mouse.get_pos()

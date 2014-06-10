@@ -118,10 +118,16 @@ class Entity:
 			rect.union_ip(f.GetRect())
 
 		if self.path is not None:
-			left = min(self.path, key=lambda pos: pos[0])[0]
-			right = max(self.path, key=lambda pos: pos[0])[0]
-			top = min(self.path, key=lambda pos: pos[1])[1]
-			bottom = max(self.path, key=lambda pos: pos[1])[1]
+			left, right, top, bottom = None, None, None, None
+			for pos in self.path:
+				if left is None or pos[0] < left:
+					left = pos[0]
+				if right is None or pos[0] > right:
+					right = pos[0]
+				if top is None or pos[1] < top:
+					top = pos[1]
+				if bottom is None or pos[1] > bottom:
+					bottom = pos[1]
 
 			path_rect = pygame.Rect(
 					left, top, right - left, bottom - top)
