@@ -3,9 +3,11 @@ import pygame
 
 import force
 
-COLOR_ENTITY_ME = (0, 255, 255)
+COLOR_ENTITY_ME = (100, 255, 255)
 COLOR_ENTITY_TARGET = (255, 0, 0)
-COLOR_ENTITY_OTHER = (0, 0, 128)
+COLOR_ENTITY_OTHER = (255, 255, 128)
+
+COLOR_PATH = (128, 255, 128)
 
 # in order: me, target, others
 _entities = []
@@ -150,8 +152,7 @@ class Entity:
 			board.DrawCircle(COLOR_ENTITY_ME, self.pos, self.radius)
 						
 			if self.path is not None:
-				print self.path
-				board.DrawLines((200, 0, 200), self.path)
+				board.DrawPath(COLOR_PATH, self.path)
 
 			for f in self.forces.values():
 				f.Draw(board)

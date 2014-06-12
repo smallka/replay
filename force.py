@@ -1,6 +1,8 @@
 import math
 import pygame
 
+COLOR_ATTRACTIVE = (255, 0, 255)
+
 class Force:
 	def __init__(self, owner, direction, magnitude, desc, target_id):
 		self.direction = direction
@@ -9,7 +11,7 @@ class Force:
 		self.target_id = target_id
 
 		self.start_pos = owner.GetPos()
-		rate = magnitude / math.hypot(direction[0], direction[1])
+		rate = 10 * magnitude / math.hypot(direction[0], direction[1])
 		self.end_pos = (
 				self.start_pos[0] + direction[0] * rate,
 				self.start_pos[1] + direction[1] * rate,
@@ -23,8 +25,8 @@ class Force:
 				abs(self.start_pos[1] - self.end_pos[1]))
 
 	def Draw(self, board):
-		board.DrawLine(
-				(255, 0, 255),
+		board.DrawArrow(
+				COLOR_ATTRACTIVE,
 				self.start_pos,
 				self.end_pos)
 

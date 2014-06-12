@@ -1,4 +1,5 @@
 
+import math
 import pygame
 
 import pgu
@@ -6,6 +7,14 @@ import pgu.text
 
 COLOR_COORD_LINE = (200, 200, 200)  # gray
 COLOR_COORD_LINE_DARK = (150, 150, 150)  # dark gray
+
+COLOR_COORD_NUM = (0, 0, 0)
+
+COLOR_INFO_FG = (0, 0, 0)
+COLOR_INFO_BG = (0, 255, 0)
+
+ARROW_LENGTH = 10
+ARROW_ANGLE = math.pi / 6
 
 class Board:
 	def __init__(self, surface, left, top, width, height):
@@ -53,7 +62,7 @@ class Board:
 				coord = self.offsetx + \
 						i * vertical_step / self.scale 
 				coord_surface = self.font.render(
-						"%.1f" % coord, True, (0, 0, 0))
+						"%.1f" % coord, True, COLOR_COORD_NUM)
 				coord_rect = coord_surface.get_rect()
 				coord_rect.midtop = (
 						self.left + i * vertical_step,
@@ -79,7 +88,7 @@ class Board:
 				coord = self.offsetz + \
 						(horizontal_count - i) * horizontal_step / self.scale 
 				coord_surface = self.font.render(
-						"%.1f" % coord, True, (0, 0, 0))
+						"%.1f" % coord, True, COLOR_COORD_NUM)
 				coord_rect = coord_surface.get_rect()
 				coord_rect.midright = (
 						self.left,
@@ -114,24 +123,31 @@ class Board:
 				int(radius * self.scale),
 				0)
 
-	def DrawLine(self, color, start_pos, end_pos):	
-		pygame.draw.aaline(
-				self.surface,
-				color,
-				self._Transform(start_pos),
-				self._Transform(end_pos),
-				2)
+	def DrawArrow(self, color, start_pos, end_pos):	
+		start = self._Transform(start_pos)
+		end = self._Transform(end_pos)
+		pygame.draw.aaline(self.surface, color, start, end)
 
-	def DrawLines(self, color, pointlist):	
-		pygame.draw.aalines(
+		angle = math.atan2(start[1] - end[1], start[0] - end[0])
+		left = (
+				end[0] + ARROW_LENGTH * math.cos(angle - ARROW_ANGLE),
+				end[1] + ARROW_LENGTH * math.sin(angle - ARROW_ANGLE))
+		pygame.draw.aaline(self.surface, color, end, left)
+		right = (
+				end[0] + ARROW_LENGTH * math.cos(angle + ARROW_ANGLE),
+				end[1] + ARROW_LENGTH * math.sin(angle + ARROW_ANGLE))
+		pygame.draw.aaline(self.surface, color, end, right)
+
+	def DrawPath(self, color, pointlist):	
+		pygame.draw.lines(
 				self.surface,
 				color,
 				False,
-				[ self._Transform(pos) for pos in pointlist ])
-
+				[ self._Transform(pos) for pos in pointlist ],
+				10)
 
 	def DrawInfoText(self, info):
-		surface = self.font.render(info, True, (0, 0, 0), (0, 255, 0))
+		surface = self.font.render(info, True, COLOR_INFO_FG, COLOR_INFO_BG)
 		rect = surface.get_rect()
 		rect.midtop = (self.left + self.width / 2, self.top + self.height + 20)
 		self.surface.blit(surface, rect)
