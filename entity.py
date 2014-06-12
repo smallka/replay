@@ -148,12 +148,13 @@ class Entity:
 	def Draw(self, board):
 		if self.id == _me_id:
 			board.DrawCircle(COLOR_ENTITY_ME, self.pos, self.radius)
+						
+			if self.path is not None:
+				print self.path
+				board.DrawLines((200, 0, 200), self.path)
 
 			for f in self.forces.values():
 				f.Draw(board)
-						
-			if self.path is not None:
-				board.DrawLines((0, 0, 0), self.path)
 
 			board.DrawInfoText("guid = %d, pos = (%.2f, %.2f)"
 					% (self.id, self.pos[0], self.pos[1]))

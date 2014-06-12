@@ -3,7 +3,10 @@ import sys
 import entity
 
 def to_pos(str):
-	return [ float(v) for v in str[1:-1].split(":") ]
+	return [ float(v) for v in str[1:-1].split(" ") ]
+
+def to_path(str):
+	return [ to_pos(each) for each in str.split("--")]
 
 ######################## commands ##########################
 #
@@ -15,7 +18,7 @@ def add_entity(ent_id, pos, radius):
 	entity.Entity(ent_id, pos, radius)
 	return lambda : entity.DelEntity(ent_id)
 
-def set_force(ent_id, direction, magnitude):
+def add_force(ent_id, direction, magnitude):
 	ent = entity.GetEntity(ent_id)
 	if ent is None:
 		return lambda : None
@@ -27,7 +30,7 @@ def set_force(ent_id, direction, magnitude):
 			same_ent.DelForce(force_id)
 	return Undo
 
-def set_path(ent_id, *path):
+def set_path(ent_id, path):
 	ent = entity.GetEntity(ent_id)
 	if ent is None:
 		return lambda : None
@@ -63,8 +66,8 @@ def set_pos(ent_id, pos):
 
 keywords = {
 	"add_entity": (int, to_pos, float, ),
-	"set_force": (int, to_pos, float, ),
-	"set_path": (int, to_pos, ),
+	"add_force": (int, to_pos, float, ),
+	"set_path": (int, to_path, ),
 	"set_target": (int, int, ),
 	"set_pos": (int, to_pos, ),
 }
@@ -83,15 +86,14 @@ class Processor:
 			line = self.lines[self.line_idx].strip()
 
 			for keyword, converters in keywords.iteritems():
-				idx = line.find(keyword)
-				if idx == -1:
+				start = line.find(keyword)
+				if start == -1:
 					continue
-				fields = line[idx:].split(",")[1:]
+				fields = line[start:].split(",")[1:]
 				args = []
-				for field_idx in xrange(len(fields)):
-					field = fields[field_idx].strip()
-					converter = converters[min(field_idx, len(converters)-1)]
-					args.append(converter(field))
+				for idx in xrange(len(converters)):
+					field = fields[idx].split("=")[1].strip()
+					args.append(converters[idx](field))
 					
 				print keyword, args
 				undo = getattr(sys.modules[__name__], keyword)(*args)

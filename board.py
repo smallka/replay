@@ -21,7 +21,7 @@ class Board:
 		self.offsetx = 0.0
 		self.offsetz = 0.0
 
-		self.font = pygame.font.Font('freesansbold.ttf', 10)
+		self.font = pygame.font.Font("freesansbold.ttf", 10)
 
 	def AdjustScaleAndOffset(self, entities):
 		rect = None

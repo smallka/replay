@@ -20,7 +20,7 @@ COLOR_BG = (255, 255, 255)  # white
 
 def main():
 	pygame.init()
-	pygame.display.set_caption('Replay')
+	pygame.display.set_caption("Replay")
 
 	clock = pygame.time.Clock()
 
@@ -116,5 +116,5 @@ def main():
 
 		clock.tick(FPS)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	main()
