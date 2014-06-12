@@ -35,11 +35,11 @@ def set_path(ent_id, path):
 	if ent is None:
 		return lambda : None
 
-	old_path = ent.SetPath(path)
+	ent.PushPath(path)
 	def Undo():
 		same_ent = entity.GetEntity(ent_id)
 		if same_ent:
-			same_ent.SetPath(old_path)
+			same_ent.PopPath()
 	return Undo
 
 def set_target(ent_id, target_id):

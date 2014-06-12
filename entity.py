@@ -82,7 +82,7 @@ class Entity:
 
 		self.force_next_id = 0
 		self.forces = {}
-		self.path = None
+		self.pathes = []
 
 		_AddEntity(self)
 
@@ -109,10 +109,11 @@ class Entity:
 		if force_id in self.forces:
 			del self.forces[force_id]
 
-	def SetPath(self, path):
-		old_path = self.path
-		self.path = path
-		return old_path
+	def PushPath(self, path):
+		self.pathes.append(path)
+
+	def PopPath(self):
+		del self.pathes[-1]
 
 	def SetPos(self, pos):
 		old_pos = self.pos
@@ -120,39 +121,18 @@ class Entity:
 		return old_pos
 
 	def GetRect(self):
-		rect = pygame.Rect(
+		return pygame.Rect(
 				self.pos[0] - self.radius,
 				self.pos[1] - self.radius,
 				self.radius * 2.0,
 				self.radius * 2.0)
-
-		for f in self.forces.values():
-			rect.union_ip(f.GetRect())
-
-		if self.path is not None:
-			left, right, top, bottom = None, None, None, None
-			for pos in self.path:
-				if left is None or pos[0] < left:
-					left = pos[0]
-				if right is None or pos[0] > right:
-					right = pos[0]
-				if top is None or pos[1] < top:
-					top = pos[1]
-				if bottom is None or pos[1] > bottom:
-					bottom = pos[1]
-
-			path_rect = pygame.Rect(
-					left, top, right - left, bottom - top)
-			rect.union_ip(path_rect)
-
-		return rect
 	
 	def Draw(self, board):
 		if self.id == _me_id:
 			board.DrawCircle(COLOR_ENTITY_ME, self.pos, self.radius)
 						
-			if self.path is not None:
-				board.DrawPath(COLOR_PATH, self.path)
+			for path in self.pathes:
+				board.DrawPath(COLOR_PATH, path)
 
 			for f in self.forces.values():
 				f.Draw(board)
