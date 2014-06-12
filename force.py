@@ -1,13 +1,18 @@
 import math
 import pygame
 
-COLOR_ATTRACTIVE = (255, 0, 255)
+force_color = {
+	"attractive" : (255, 0, 0),
+	"repulsive" : (0, 255, 128),
+	"total repulsive" : (0, 128, 0),
+	"final" : (0, 0, 255),
+}
 
 class Force:
-	def __init__(self, owner, direction, magnitude, desc, target_id):
+	def __init__(self, owner, direction, magnitude, catalog, target_id):
 		self.direction = direction
 		self.magnitude = magnitude
-		self.desc = desc
+		self.catalog = catalog
 		self.target_id = target_id
 
 		self.start_pos = owner.GetPos()
@@ -26,7 +31,7 @@ class Force:
 
 	def Draw(self, board):
 		board.DrawArrow(
-				COLOR_ATTRACTIVE,
+				force_color[self.catalog],
 				self.start_pos,
 				self.end_pos)
 

@@ -18,12 +18,12 @@ def add_entity(ent_id, pos, radius):
 	entity.Entity(ent_id, pos, radius)
 	return lambda : entity.DelEntity(ent_id)
 
-def add_force(ent_id, direction, magnitude):
+def add_force(ent_id, direction, magnitude, catalog):
 	ent = entity.GetEntity(ent_id)
 	if ent is None:
 		return lambda : None
 
-	force_id = ent.AddForce(direction, magnitude, "", None)
+	force_id = ent.AddForce(direction, magnitude, catalog, None)
 	def Undo():
 		same_ent = entity.GetEntity(ent_id)
 		if same_ent:
@@ -66,7 +66,7 @@ def set_pos(ent_id, pos):
 
 keywords = {
 	"add_entity": (int, to_pos, float, ),
-	"add_force": (int, to_pos, float, ),
+	"add_force": (int, to_pos, float, str, ),
 	"set_path": (int, to_path, ),
 	"set_target": (int, int, ),
 	"set_pos": (int, to_pos, ),
@@ -95,7 +95,6 @@ class Processor:
 					field = fields[idx].split("=")[1].strip()
 					args.append(converters[idx](field))
 					
-				print keyword, args
 				undo = getattr(sys.modules[__name__], keyword)(*args)
 				self.cmd_queue.append((self.line_idx, undo))
 				return "%d: %s" % (self.line_idx, line)

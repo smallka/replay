@@ -5,9 +5,9 @@ import force
 
 COLOR_ENTITY_ME = (100, 255, 255)
 COLOR_ENTITY_TARGET = (255, 0, 0)
-COLOR_ENTITY_OTHER = (255, 255, 128)
+COLOR_ENTITY_OTHER = (128, 255, 128)
 
-COLOR_PATH = (128, 255, 128)
+COLOR_PATH = (255, 255, 128)
 
 # in order: me, target, others
 _entities = []

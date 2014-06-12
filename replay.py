@@ -18,7 +18,7 @@ WIN_HEIGHT = BOARD_TOP + BOARD_HEIGHT + 40
 
 COLOR_BG = (255, 255, 255)  # white
 
-def main():
+def main(filename):
 	pygame.init()
 	pygame.display.set_caption("Replay")
 
@@ -34,7 +34,7 @@ def main():
 	container.add(box, BOARD_LEFT, 0)
 	app.init(container)
 
-	proc = processor.Processor("input.log")
+	proc = processor.Processor(filename)
 
 	while True:
 		need_scroll_down = False
@@ -117,4 +117,8 @@ def main():
 		clock.tick(FPS)
 
 if __name__ == "__main__":
-	main()
+	if len(sys.argv) < 2:
+		filename = "sample.log"
+	else:
+		filename = sys.argv[1]
+	main(filename)
